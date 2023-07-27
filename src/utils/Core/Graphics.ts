@@ -1,3 +1,5 @@
+import { Style } from '@/utils/Core/Style.ts';
+
 export class Point {
   public x: number;
   public y: number;
@@ -9,11 +11,13 @@ export class Point {
 }
 
 export abstract class Paths {
+  protected _parent?: Graphics;
   public points: Array<Point> = []; // 锚点
+  public visible: boolean = true; // 是否可见
   public dragged: boolean = false; // 拖拽
-  // public enabled: boolean = true;  // 启用
-  public visible: boolean = true; // 可见
-  // public click: boolean = false; // 点击
+  public selected: boolean = false; // 是否选中
+  public readonly: boolean = false; // 是否只读
+  public style: Style = new Style(); // 样式
 
   public addPoint(x: number, y: number) {
     this.points.push(new Point(x, y));
@@ -22,17 +26,15 @@ export abstract class Paths {
   protected abstract draw(): void;
 
   remove() {
-    if (this.parent) {
-      this.parent.children.splice(this.parent.children.indexOf(this), 1);
-    }
+    const children = this.parent?.children;
+    if (children) children.splice(children.indexOf(this), 1);
   }
 
-  // 父节点
-  get parent() {
+  get parent(): Graphics | undefined {
     return this._parent;
   }
 
-  set parent(parent: Paths) {
+  set parent(parent: Graphics) {
     this._parent = parent;
   }
 }
@@ -48,17 +50,14 @@ export class Shape extends Paths {
 }
 
 export class Graphics {
-  children: Array<Paths>;
-
-  constructor(x, y, width, height) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-  }
+  protected __children: Paths[] = [];
 
   addShape(shape: Paths) {
-    this.children.push(shape);
+    this.__children.push(shape);
     shape.parent = this;
+  }
+
+  get children() {
+    return this.__children;
   }
 }
