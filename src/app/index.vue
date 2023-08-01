@@ -1,12 +1,7 @@
 <template>
-  <div class="App">
-
-    App
-    <canvas
-  </div>
+  <router-view/>
 </template>
 
 <script lang="ts">export default { name: 'App' };</script>
-<script lang="ts" setup>
-// init
-</script>
+
+<style lang="scss" src="./style.scss"/>
