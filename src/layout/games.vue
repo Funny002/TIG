@@ -1,11 +1,10 @@
 <template>
   <div class="var-App__header">
-    {{ GameData }}
     <div>
-      <div class="var-App__header--title">{{ item?.name }}</div>
-      <div class="var-App__header--description">{{ item?.description || 'description' }}</div>
+      <div class="var-App__header--title">{{ GameData?.name }}</div>
+      <div class="var-App__header--description">{{ GameData?.description || 'description' }}</div>
     </div>
-    <div class="var-App__header--version">version: {{ item?.version }}</div>
+    <div class="var-App__header--version">version: {{ GameData?.version }}</div>
   </div>
   <div class="var-App__body is-game">
     <router-view/>
@@ -22,10 +21,4 @@ import { computed } from 'vue';
 const route = useRoute();
 
 const GameData = computed(() => GameRoutes.find(item => '/games/' + item.path === route.path));
-
-const item = {
-  name: 'Games',
-  description: 'description',
-  version: '1.0.0',
-};
 </script>
