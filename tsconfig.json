@@ -23,7 +23,7 @@
     "paths": {
       "@games/*": ["games/*"],
       "@utils": ["src/utils"],
-      "@home/*": ["src/home/*"],
+      "@views/*": ["src/views/*"],
       "@utils/*": ["src/utils/*"],
       "@layout/*": ["src/layout/*"]
     }

@@ -12,7 +12,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "crypto-js": "^4.1.1",
     "tig-core": "github:Funny002/TIG-Core",
     "vue": "^3.3.4"
   },
@@ -21,6 +20,8 @@
     "@types/crypto-js": "^4.1.1",
     "@types/node": "^20.4.5",
     "@vitejs/plugin-vue": "^4.2.3",
+    "color": "^4.2.3",
+    "crypto-js": "^4.1.1",
     "sass": "^1.64.1",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
