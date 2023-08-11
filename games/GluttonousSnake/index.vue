@@ -1,5 +1,5 @@
 <template>
-  <div class="var-GluttonousSnake" ref="root" tabindex="-1">
+  <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus>
     <canvas ref="canvas"/>
   </div>
 </template>
@@ -7,7 +7,7 @@
 <script lang="ts">export default { name: 'Gluttonous Snake' };</script>
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
-import { KeyBinding } from '@utils/BindingKey';
+import { Keyboard } from '@utils/keyboard.ts';
 import { Snake } from './utils/Graphics.ts';
 import { Create } from 'tig-core/src';
 
@@ -17,7 +17,7 @@ const data = reactive<{
   stop: boolean;
   core: Create | null;
   snake: Snake | null;
-  keyBinding: KeyBinding | null;
+  keyBinding: Keyboard | null;
   timeout: NodeJS.Timeout | null;
 }>({
   core: null,
@@ -38,49 +38,46 @@ onMounted(() => {
 });
 
 function initKeyBinding(dom: HTMLDivElement) {
-  data.keyBinding = new KeyBinding(dom);
+  data.keyBinding = new Keyboard(dom);
+
+  function setDirection(dir: 0 | 1 | 2 | 3) {
+    return function () {
+      if (data.snake) {
+        if (data.snake.direction == 0 && dir != 1) {
+          data.snake.direction = dir;
+        } else if (data.snake.direction == 1 && dir != 0) {
+          data.snake.direction = dir;
+        } else if (data.snake.direction == 2 && dir != 3) {
+          data.snake.direction = dir;
+        } else if (data.snake.direction == 3 && dir != 2) {
+          data.snake.direction = dir;
+        }
+      }
+    };
+  }
+
+  data.keyBinding.on('ArrowUp', setDirection(0));
+  data.keyBinding.on('ArrowDown', setDirection(1));
+  data.keyBinding.on('ArrowLeft', setDirection(2));
+  data.keyBinding.on('ArrowRight', setDirection(3));
 }
 
 function initCreate(canvas: HTMLCanvasElement) {
   data.core = new Create(canvas, boxSize.value);
+  // data.core.on('RealTimeFPS', console.log);
   data.core.on('FPS', console.log);
   data.stop = false;
   data.core.run();
   initSnake();
   Run();
-  // for (let i = 0; i < 5; i++) {
-  //   const x = createSnakeItem(10, 50 - i * 10);
-  //   data.core.insert(x);
-  // }
 }
 
 // =====================================================
 function initSnake() {
-  const snake = data.snake = new Snake(<Create>data.core, boxSize.value);
+  data.snake = new Snake(<Create>data.core, boxSize.value);
   data.snake.addChild(0, 2);
   data.snake.addChild(0, 1);
   data.snake.addChild(0, 0);
-
-  root.value?.addEventListener('keydown', (e) => {
-    switch (e.key) {
-      case 'ArrowUp': {
-        snake.direction = 0;
-        break;
-      }
-      case 'ArrowDown': {
-        snake.direction = 1;
-        break;
-      }
-      case 'ArrowLeft': {
-        snake.direction = 2;
-        break;
-      }
-      case 'ArrowRight': {
-        snake.direction = 3;
-        break;
-      }
-    }
-  });
 }
 
 function StopToggleStatus() {
@@ -96,7 +93,7 @@ function StopToggleStatus() {
 function Run() {
   if (data.stop) return false;
   data.snake?.move();
-  data.timeout = setTimeout(Run, 100);
+  data.timeout = setTimeout(Run, 140);
 }
 
 // stop
