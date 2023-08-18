@@ -42,17 +42,7 @@ function initKeyBinding(dom: HTMLDivElement) {
 
   function setDirection(dir: 0 | 1 | 2 | 3) {
     return function () {
-      if (data.snake) {
-        if (data.snake.direction == 0 && dir != 1) {
-          data.snake.direction = dir;
-        } else if (data.snake.direction == 1 && dir != 0) {
-          data.snake.direction = dir;
-        } else if (data.snake.direction == 2 && dir != 3) {
-          data.snake.direction = dir;
-        } else if (data.snake.direction == 3 && dir != 2) {
-          data.snake.direction = dir;
-        }
-      }
+      data.snake && (data.snake.direction = dir);
     };
   }
 
@@ -64,43 +54,43 @@ function initKeyBinding(dom: HTMLDivElement) {
 
 function initCreate(canvas: HTMLCanvasElement) {
   data.core = new Create(canvas, boxSize.value);
-  // data.core.on('RealTimeFPS', console.log);
   data.core.on('FPS', console.log);
   data.stop = false;
   data.core.run();
   initSnake();
-  Run();
 }
 
 // =====================================================
 function initSnake() {
-  data.snake = new Snake(<Create>data.core, boxSize.value);
-  data.snake.addChild(0, 2);
-  data.snake.addChild(0, 1);
-  data.snake.addChild(0, 0);
-}
-
-function StopToggleStatus() {
-  data.stop = !data.stop;
-  if (!data.stop) {
-    Run();
-  } else {
-    Stop();
+  const { width, height } = boxSize.value;
+  data.snake = new Snake(<Create>data.core, width, height);
+  for (let i = 10; i > 0; i--) {
+    data.snake.addChild(1, 1 + i);
   }
+  data.snake.start();
+  data.snake.on('crash', () => {
+    console.log(data.core);
+  });
 }
 
-// run
-function Run() {
-  if (data.stop) return false;
-  data.snake?.move();
-  data.timeout = setTimeout(Run, 140);
-}
-
-// stop
-function Stop() {
-  clearTimeout(<NodeJS.Timeout>data.timeout);
-}
-
+// function StopToggleStatus() {
+//   data.stop = !data.stop;
+//   if (!data.stop) {
+//     Run();
+//   } else {
+//     Stop();
+//   }
+// }
+// // run
+// function Run() {
+//   if (data.stop) return false;
+//   data.snake?.move();
+//   data.timeout = setTimeout(Run, 140);
+// }
+// // stop
+// function Stop() {
+//   clearTimeout(<NodeJS.Timeout>data.timeout);
+// }
 </script>
 
 <style lang="scss">

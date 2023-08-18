@@ -5,6 +5,7 @@ import { resolve } from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  cacheDir: './cache',
   resolve: {
     alias: {
       '@games': resolve(__dirname, 'games'),
