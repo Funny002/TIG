@@ -1,11 +1,12 @@
 <template>
   <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus>
-    <canvas ref="canvas"/>
+    <canvas ref="canvas" :width="canvasStyle.width" :height="canvasStyle.height" :style="{width: canvasStyle.width + 'px', height: canvasStyle.height + 'px'}"/>
   </div>
 </template>
 
 <script lang="ts">export default { name: 'Gluttonous Snake' };</script>
 <script setup lang="ts">
+import { GameBackgroundLine } from '@games/utils/Graphics.ts';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { Keyboard } from '@utils/keyboard.ts';
 import { Snake } from './utils/Graphics.ts';
@@ -13,23 +14,25 @@ import { Create } from 'tig-core/src';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
+
 const data = reactive<{
-  stop: boolean;
   core: Create | null;
   snake: Snake | null;
+  blockSize: number;
   keyBinding: Keyboard | null;
-  timeout: NodeJS.Timeout | null;
+  border: { width: number; height: number; }
 }>({
   core: null,
-  stop: true,
   snake: null,
-  timeout: null,
+  blockSize: 10,
   keyBinding: null,
+  border: { width: 80, height: 40 },
 });
 
-const boxSize = computed(() => {
-  const { offsetWidth, offsetHeight } = root.value || { offsetWidth: 0, offsetHeight: 0 };
-  return { width: offsetWidth, height: offsetHeight };
+// 实际盒子大小
+const canvasStyle = computed(() => {
+  const { width, height } = data.border;
+  return { width: width * data.blockSize, height: height * data.blockSize };
 });
 
 onMounted(() => {
@@ -39,10 +42,23 @@ onMounted(() => {
 
 function initKeyBinding(dom: HTMLDivElement) {
   data.keyBinding = new Keyboard(dom);
+  let timeout: NodeJS.Timeout | null = null;
 
   function setDirection(dir: 0 | 1 | 2 | 3) {
     return function () {
-      data.snake && (data.snake.direction = dir);
+      if (!data.snake) return;
+      const snake = data.snake;
+      // 长按加速
+      if (snake.direction === dir) {
+        snake.timer = 100;
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          snake.timer = 240;
+          timeout = null;
+        }, 100);
+      }
+      // 方向变更
+      snake.direction = dir;
     };
   }
 
@@ -53,44 +69,31 @@ function initKeyBinding(dom: HTMLDivElement) {
 }
 
 function initCreate(canvas: HTMLCanvasElement) {
-  data.core = new Create(canvas, boxSize.value);
+  const { width, height } = canvasStyle.value;
+  data.core = new Create(canvas, canvasStyle.value);
   data.core.on('FPS', console.log);
-  data.stop = false;
+  // 添加背景
+  data.core.insert(new GameBackgroundLine(width, height, 10));
   data.core.run();
+  // 初始化蛇
   initSnake();
 }
 
 // =====================================================
 function initSnake() {
-  const { width, height } = boxSize.value;
-  data.snake = new Snake(<Create>data.core, width, height);
-  for (let i = 10; i > 0; i--) {
-    data.snake.addChild(1, 1 + i);
-  }
-  data.snake.start();
-  data.snake.on('crash', () => {
-    console.log(data.core);
-  });
+  // data.snake = new Snake(<Create>data.core, data.border, data.blockSize);
+  // for (let i = 10; i > 0; i--) {
+  //   data.snake.addChild(1, 1 + i);
+  // }
+  // data.snake.start();
+  // data.snake.on('crash', items => {
+  //   console.log('crash', items);
+  //   if (data.snake?.isChild(items[0])) {
+  //     data.snake?.stop();
+  //     // 游戏结束
+  //   }
+  // });
 }
-
-// function StopToggleStatus() {
-//   data.stop = !data.stop;
-//   if (!data.stop) {
-//     Run();
-//   } else {
-//     Stop();
-//   }
-// }
-// // run
-// function Run() {
-//   if (data.stop) return false;
-//   data.snake?.move();
-//   data.timeout = setTimeout(Run, 140);
-// }
-// // stop
-// function Stop() {
-//   clearTimeout(<NodeJS.Timeout>data.timeout);
-// }
 </script>
 
 <style lang="scss">
@@ -98,5 +101,10 @@ function initSnake() {
   width: 100%;
   height: 100%;
   outline: none;
+
+  > canvas {
+    border: 1px solid #bbb;
+    box-sizing: content-box;
+  }
 }
 </style>

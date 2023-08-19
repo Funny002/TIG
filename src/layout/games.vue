@@ -22,3 +22,10 @@ const route = useRoute();
 
 const GameData = computed(() => GameRoutes.find(item => '/games/' + item.path === route.path));
 </script>
+
+<style lang="scss">
+.var-App__body.is-game {
+  --background: #9bad89;
+  background: var(--background);
+}
+</style>

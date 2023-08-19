@@ -1,19 +1,19 @@
 import { Create, Shape, Point, Listener } from 'tig-core/src';
 import { AnimationFrame, getTime } from './Animation.ts';
 
-const boxSize = 10;
-
 export class SnakeItem extends Shape {
-  public radii: number;
-
+  // TODO: `蛇` 头
   public head: boolean = false;
 
-  constructor(left: number, top: number, radii = 1, head = false) {
+  // TODO: 方块大小
+  private readonly block: number;
+
+  constructor(left: number, top: number, block: number, head = false) {
     super();
-    this.top = top;
-    this.left = left;
     this.head = head;
-    this.radii = radii;
+    this.block = block;
+    this.top = top * block;
+    this.left = left * block;
     this.addChild(new Point(0, 0));
   }
 
@@ -23,19 +23,19 @@ export class SnakeItem extends Shape {
   }
 
   get size() {
-    return { width: boxSize, height: boxSize };
+    return { width: this.block, height: this.block };
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillStyle = '#777';
+    ctx.strokeStyle = '#777';
     if (this.head) {
-      ctx.fillStyle = 'rgba(255, 73, 73, 0.8)';
-      ctx.strokeStyle = 'rgba(255, 73, 73, 0.8)';
+      ctx.fillStyle = '#f66';
+      ctx.strokeStyle = '#f66';
     }
     ctx.lineWidth = 1;
-    ctx.strokeRect(1.5, 1.5, boxSize - 3, boxSize - 3);
-    ctx.roundRect(2.5, 2.5, boxSize - 5, boxSize - 5, 1);
+    ctx.strokeRect(1, 1, this.block - 3, this.block - 3);
+    ctx.roundRect(2.5, 2.5, this.block - 6, this.block - 6, 1);
     ctx.fill();
   }
 }
@@ -46,6 +46,9 @@ export class Snake {
 
   // TODO: 时间间隔
   public timer: number = 240;
+
+  // TODO: 方块大小
+  private readonly block: number;
 
   // TODO: 上一次的方向
   private lestDirection: 0 | 1 | 2 | 3 | -1 = -1;
@@ -83,16 +86,16 @@ export class Snake {
     return this.children.length;
   }
 
-  constructor(core: Create, width: number, height: number) {
+  constructor(core: Create, size: { width: number; height: number }, block: number) {
     this.core = core;
-    this.boxSize = { width: Math.ceil(width / boxSize), height: Math.ceil(height / boxSize) };
-    //
+    this.block = block;
+    this.boxSize = size;
     Object.defineProperty(this, 'listener', { enumerable: false });
   }
 
   // TODO: 添加子项
   public addChild(x: number, y: number) {
-    const snake = new SnakeItem(x * boxSize, y * boxSize, 2, true);
+    const snake = new SnakeItem(x, y, this.block, true);
     this.children[0]?.setHead(false);
     this.children.unshift(snake);
     //
@@ -112,7 +115,7 @@ export class Snake {
   private move() {
     const head = this.children[0];
     if (!head) return;
-    let [x, y] = [head.left / boxSize, head.top / boxSize];
+    let [x, y] = [head.left / this.block, head.top / this.block];
     switch (this.direction) {
       case 0: { // 上
         y -= 1;
@@ -169,6 +172,10 @@ export class Snake {
   // TODO: 停止
   public stop() {
     this.isStop = true;
+  }
+
+  public isChild(shape: any) {
+    return this.children.indexOf(<SnakeItem>shape) >= 0;
   }
 
   public on(key: 'move' | 'crash', listener: (data: any) => void) {
