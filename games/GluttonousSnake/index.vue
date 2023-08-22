@@ -6,11 +6,11 @@
 
 <script lang="ts">export default { name: 'Gluttonous Snake' };</script>
 <script setup lang="ts">
-import { GameBackgroundLine } from '@games/utils/Graphics.ts';
+import { GameBackgroundBlock } from '@games/utils/Graphics.ts';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { Keyboard } from '@utils/keyboard.ts';
 import { Snake } from './utils/Graphics.ts';
-import { Create } from 'tig-core/src';
+import { Create } from 'tig-core';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
@@ -31,8 +31,9 @@ const data = reactive<{
 
 // 实际盒子大小
 const canvasStyle = computed(() => {
-  const { width, height } = data.border;
-  return { width: width * data.blockSize, height: height * data.blockSize };
+  const { border: { width, height }, blockSize } = data;
+  const getSize = (value: number) => (blockSize + 1) * value - 1;
+  return { width: getSize(width), height: getSize(height) };
 });
 
 onMounted(() => {
@@ -46,19 +47,19 @@ function initKeyBinding(dom: HTMLDivElement) {
 
   function setDirection(dir: 0 | 1 | 2 | 3) {
     return function () {
-      if (!data.snake) return;
-      const snake = data.snake;
-      // 长按加速
-      if (snake.direction === dir) {
-        snake.timer = 100;
-        if (timeout) clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          snake.timer = 240;
-          timeout = null;
-        }, 100);
-      }
-      // 方向变更
-      snake.direction = dir;
+      //   if (!data.snake) return;
+      //   const snake = data.snake;
+      //   // 长按加速
+      //   if (snake.direction === dir) {
+      //     snake.timer = 100;
+      //     if (timeout) clearTimeout(timeout);
+      //     timeout = setTimeout(() => {
+      //       snake.timer = 240;
+      //       timeout = null;
+      //     }, 100);
+      //   }
+      //   // 方向变更
+      //   snake.direction = dir;
     };
   }
 
@@ -73,7 +74,8 @@ function initCreate(canvas: HTMLCanvasElement) {
   data.core = new Create(canvas, canvasStyle.value);
   data.core.on('FPS', console.log);
   // 添加背景
-  data.core.insert(new GameBackgroundLine(width, height, 10));
+  data.core.insert(new GameBackgroundBlock(width, height, 10));
+
   data.core.run();
   // 初始化蛇
   initSnake();
@@ -103,7 +105,7 @@ function initSnake() {
   outline: none;
 
   > canvas {
-    border: 1px solid #bbb;
+    border: 1px solid #000;
     box-sizing: content-box;
   }
 }

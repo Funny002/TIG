@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "tig-core": "github:Funny002/TIG-Core",
+    "tig-core": "^1.1.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {

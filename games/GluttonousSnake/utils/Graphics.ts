@@ -1,44 +1,8 @@
-import { Create, Shape, Point, Listener } from 'tig-core/src';
-import { AnimationFrame, getTime } from './Animation.ts';
-
-export class SnakeItem extends Shape {
-  // TODO: `蛇` 头
-  public head: boolean = false;
-
-  // TODO: 方块大小
-  private readonly block: number;
-
-  constructor(left: number, top: number, block: number, head = false) {
-    super();
-    this.head = head;
-    this.block = block;
-    this.top = top * block;
-    this.left = left * block;
-    this.addChild(new Point(0, 0));
-  }
-
-  setHead(head: boolean) {
-    this.head = head;
-    this.update();
-  }
-
-  get size() {
-    return { width: this.block, height: this.block };
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#777';
-    ctx.strokeStyle = '#777';
-    if (this.head) {
-      ctx.fillStyle = '#f66';
-      ctx.strokeStyle = '#f66';
-    }
-    ctx.lineWidth = 1;
-    ctx.strokeRect(1, 1, this.block - 3, this.block - 3);
-    ctx.roundRect(2.5, 2.5, this.block - 6, this.block - 6, 1);
-    ctx.fill();
-  }
-}
+import { Create, Listener, getTime, AnimationFrame } from 'tig-core';
+import { GameBlock } from '@games/utils/Graphics.ts';
+//     ctx.strokeStyle = '#777';
+//     if (this.head) {
+//       ctx.fillStyle = '#f66';
 
 // TODO: 蛇
 export class Snake {
@@ -59,6 +23,7 @@ export class Snake {
     return this._direction;
   }
 
+  // TODO: 设置方向
   set direction(value) {
     if (this.lestDirection === 0 && value === 1) return;
     if (this.lestDirection === 1 && value === 0) return;
@@ -70,38 +35,50 @@ export class Snake {
   // TODO: 是否停止
   private isStop = true;
 
+  // TODO: 上一次的时间
+  private lestTime: number = 0;
+
   // TODO: 子类
-  private children: SnakeItem[] = [];
+  private children: GameBlock[] = [];
 
   // TODO: 监听器
   private readonly listener = new Listener();
 
-  // TODO: 长
-  private lestTime: number = 0;
-
   // TODO: 大小
-  private boxSize: { width: number; height: number };
+  private readonly blockSize: { width: number; height: number };
 
+  // TODO: 长度
   get length() {
     return this.children.length;
   }
 
-  constructor(core: Create, size: { width: number; height: number }, block: number) {
+  constructor(core: Create, blockSize: { width: number; height: number }, block: number) {
     this.core = core;
     this.block = block;
-    this.boxSize = size;
+    this.blockSize = blockSize;
     Object.defineProperty(this, 'listener', { enumerable: false });
+  }
+
+  // TODO: 坐标处理
+  private handlerPoint(x: number, y: number) {
+    const { width, height } = this.blockSize;
+    if (x < 0) x = width - -x;
+    if (y < 0) y = height - -y;
+    if (x > width) x = x % width;
+    if (y > height) y = y % height;
+    const newBlock = this.block + 1;
+    return { x: x * newBlock, y: y * newBlock };
   }
 
   // TODO: 添加子项
   public addChild(x: number, y: number) {
-    const snake = new SnakeItem(x, y, this.block, true);
-    this.children[0]?.setHead(false);
+    const point = this.handlerPoint(x, y);
+    const snake = new GameBlock(point.x, point.y, this.block, '#f66');
+    this.children[0]?.setColor('#555');
     this.children.unshift(snake);
     //
     const crash = this.core.crashDetection(snake);
     if (crash.length) this.listener.publish('crash', crash);
-    //
     this.core.insert(snake);
   }
 
@@ -116,32 +93,32 @@ export class Snake {
     const head = this.children[0];
     if (!head) return;
     let [x, y] = [head.left / this.block, head.top / this.block];
-    switch (this.direction) {
-      case 0: { // 上
-        y -= 1;
-        y = y < 0 ? this.boxSize.height - 1 : y;
-        break;
-      }
-      case 1: { // 下
-        y += 1;
-        y = y >= this.boxSize.height ? 0 : y;
-        break;
-      }
-      case 2: { // 左
-        x -= 1;
-        x = x < 0 ? this.boxSize.width - 1 : x;
-        break;
-      }
-      case 3: { // 右
-        x += 1;
-        x = x >= this.boxSize.width ? 0 : x;
-        break;
-      }
-    }
-    this.lestDirection = this.direction;
-    const foot = this.children.pop();
-    foot?.remove();
-    this.addChild(x, y);
+//     switch (this.direction) {
+//       case 0: { // 上
+//         y -= 1;
+//         y = y < 0 ? this.boxSize.height - 1 : y;
+//         break;
+//       }
+//       case 1: { // 下
+//         y += 1;
+//         y = y >= this.boxSize.height ? 0 : y;
+//         break;
+//       }
+//       case 2: { // 左
+//         x -= 1;
+//         x = x < 0 ? this.boxSize.width - 1 : x;
+//         break;
+//       }
+//       case 3: { // 右
+//         x += 1;
+//         x = x >= this.boxSize.width ? 0 : x;
+//         break;
+//       }
+//     }
+//     this.lestDirection = this.direction;
+//     const foot = this.children.pop();
+//     foot?.remove();
+//     this.addChild(x, y);
   }
 
   // TODO: 开始移动
@@ -174,14 +151,17 @@ export class Snake {
     this.isStop = true;
   }
 
+  // TODO: 是否为子项
   public isChild(shape: any) {
-    return this.children.indexOf(<SnakeItem>shape) >= 0;
+    return this.children.indexOf(<GameBlock>shape) >= 0;
   }
 
+  // TODO: 添加监听
   public on(key: 'move' | 'crash', listener: (data: any) => void) {
     this.listener.subscribe(key, listener);
   }
 
+  // TODO: 取消监听
   public off(key: 'move' | 'crash', listener: (data: any) => void) {
     this.listener.unsubscribe(key, listener);
   }

@@ -1,4 +1,4 @@
-import { Shape } from 'tig-core/src';
+import { Shape, GraphsCanvas } from 'tig-core';
 
 // TODO: 绘制基础方块
 function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 0, top: number = 0, color: string = '#849374') {
@@ -6,8 +6,8 @@ function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 
   ctx.fillStyle = color;
   ctx.strokeStyle = color;
   const newWidth = block - 4;
-  ctx.strokeRect(left + 0.5, top + 0.5, block, block);
-  ctx.roundRect(left + 2.5, top + 2.5, newWidth, newWidth, 1);
+  ctx.strokeRect(left, top, block, block);
+  ctx.roundRect(left + 2, top + 2, newWidth, newWidth, 1);
   ctx.fill();
 }
 
@@ -65,18 +65,22 @@ export class GameBackgroundBlock extends Shape {
     this.update();
   }
 
+  // TODO: 大小
   get size() {
     return { width: this.width, height: this.height };
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     const { width, height, block, color } = this;
-    const newBlock = block + 2;
+    const BlockCanvas = new GraphsCanvas(block, block);
+    drawBlock(BlockCanvas.context, block, 0, 0, color);
+    //
+    const newBlock = block + 1;
     const newWidth = Math.ceil((width - block) / block);
     const newHeight = Math.ceil((height - block) / block);
     for (let left = 0; left < newWidth; left++) {
       for (let top = 0; top < newHeight; top++) {
-        drawBlock(ctx, block, left * newBlock, top * newBlock, color);
+        ctx.drawImage(BlockCanvas.canvas, left * newBlock, top * newBlock);
       }
     }
   }
