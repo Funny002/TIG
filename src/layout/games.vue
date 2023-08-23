@@ -26,6 +26,5 @@ const GameData = computed(() => GameRoutes.find(item => '/games/' + item.path ==
 <style lang="scss">
 .var-App__body.is-game {
   --background: #9bad89;
-  background: var(--background);
 }
 </style>

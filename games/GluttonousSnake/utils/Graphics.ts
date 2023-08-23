@@ -70,16 +70,21 @@ export class Snake {
     return { x: x * newBlock, y: y * newBlock };
   }
 
-  // TODO: 添加子项
-  public addChild(x: number, y: number) {
-    const point = this.handlerPoint(x, y);
-    const snake = new GameBlock(point.x, point.y, this.block, '#f66');
-    this.children[0]?.setColor('#555');
+  private handlerChild(snake: GameBlock) {
+    this.children[0]?.setColor('#000');
     this.children.unshift(snake);
     //
     const crash = this.core.crashDetection(snake);
     if (crash.length) this.listener.publish('crash', crash);
     this.core.insert(snake);
+  }
+
+  // TODO: 添加子项
+  public addChild(...points: { x: number, y: number }[]) {
+    const list = points.map(({ x, y }) => this.handlerPoint(x, y));
+    for (const item of list) {
+      this.handlerChild(new GameBlock(item.x, item.y, this.block, '#e22'));
+    }
   }
 
   // TODO: 删除子项
@@ -92,33 +97,41 @@ export class Snake {
   private move() {
     const head = this.children[0];
     if (!head) return;
-    let [x, y] = [head.left / this.block, head.top / this.block];
-//     switch (this.direction) {
-//       case 0: { // 上
-//         y -= 1;
-//         y = y < 0 ? this.boxSize.height - 1 : y;
-//         break;
-//       }
-//       case 1: { // 下
-//         y += 1;
-//         y = y >= this.boxSize.height ? 0 : y;
-//         break;
-//       }
-//       case 2: { // 左
-//         x -= 1;
-//         x = x < 0 ? this.boxSize.width - 1 : x;
-//         break;
-//       }
-//       case 3: { // 右
-//         x += 1;
-//         x = x >= this.boxSize.width ? 0 : x;
-//         break;
-//       }
-//     }
-//     this.lestDirection = this.direction;
-//     const foot = this.children.pop();
-//     foot?.remove();
-//     this.addChild(x, y);
+    const newBlock = this.block + 1;
+    let [x, y] = [head.left / newBlock, head.top / newBlock];
+    switch (this.direction) {
+      case 0: { // 上
+        y -= 1;
+        y = y < 0 ? this.blockSize.height - 1 : y;
+        break;
+      }
+      case 1: { // 下
+        y += 1;
+        y = y >= this.blockSize.height ? 0 : y;
+        break;
+      }
+      case 2: { // 左
+        x -= 1;
+        x = x < 0 ? this.blockSize.width - 1 : x;
+        break;
+      }
+      case 3: { // 右
+        x += 1;
+        x = x >= this.blockSize.width ? 0 : x;
+        break;
+      }
+    }
+    this.lestDirection = this.direction;
+    const foot = this.children.pop();
+    if (foot) {
+      // 脱离画布
+      foot.parent?.removeChild(foot.index);
+      const point = this.handlerPoint(x, y);
+      foot.top = point.y;
+      foot.left = point.x;
+      foot.setColor('#e22');
+      this.handlerChild(foot);
+    }
   }
 
   // TODO: 开始移动

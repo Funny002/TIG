@@ -1,6 +1,8 @@
 <template>
   <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus>
-    <canvas ref="canvas" :width="canvasStyle.width" :height="canvasStyle.height" :style="{width: canvasStyle.width + 'px', height: canvasStyle.height + 'px'}"/>
+    <div style="padding: 10px" :style="{width: canvasStyle.width + 20+'px', height: canvasStyle.height +  20+'px'}">
+      <canvas ref="canvas" :width="canvasStyle.width" :height="canvasStyle.height" :style="{width: canvasStyle.width + 'px', height: canvasStyle.height + 'px'}"/>
+    </div>
   </div>
 </template>
 
@@ -46,20 +48,24 @@ function initKeyBinding(dom: HTMLDivElement) {
   let timeout: NodeJS.Timeout | null = null;
 
   function setDirection(dir: 0 | 1 | 2 | 3) {
+    let timer = 0;
     return function () {
-      //   if (!data.snake) return;
-      //   const snake = data.snake;
-      //   // 长按加速
-      //   if (snake.direction === dir) {
-      //     snake.timer = 100;
-      //     if (timeout) clearTimeout(timeout);
-      //     timeout = setTimeout(() => {
-      //       snake.timer = 240;
-      //       timeout = null;
-      //     }, 100);
-      //   }
-      //   // 方向变更
-      //   snake.direction = dir;
+      if (!data.snake) return;
+      const snake = data.snake;
+      if (!timer) timer = snake.timer;
+      const newTimer = 40;
+      // 长按加速
+      if (snake.direction === dir) {
+        snake.timer = newTimer;
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          snake.timer = timer;
+          timeout = null;
+          timer = 0;
+        }, newTimer);
+      }
+      // 方向变更
+      snake.direction = dir;
     };
   }
 
@@ -75,7 +81,6 @@ function initCreate(canvas: HTMLCanvasElement) {
   data.core.on('FPS', console.log);
   // 添加背景
   data.core.insert(new GameBackgroundBlock(width, height, 10));
-
   data.core.run();
   // 初始化蛇
   initSnake();
@@ -83,18 +88,18 @@ function initCreate(canvas: HTMLCanvasElement) {
 
 // =====================================================
 function initSnake() {
-  // data.snake = new Snake(<Create>data.core, data.border, data.blockSize);
-  // for (let i = 10; i > 0; i--) {
-  //   data.snake.addChild(1, 1 + i);
-  // }
-  // data.snake.start();
-  // data.snake.on('crash', items => {
-  //   console.log('crash', items);
-  //   if (data.snake?.isChild(items[0])) {
-  //     data.snake?.stop();
-  //     // 游戏结束
-  //   }
-  // });
+  data.snake = new Snake(<Create>data.core, data.border, data.blockSize);
+  data.snake.timer = 180;
+  const snakePoints = Array.from({ length: 10 }).map((_, i) => ({ x: 0, y: 10 - i }));
+  data.snake?.addChild(...snakePoints);
+  data.snake.start();
+  data.snake.on('crash', items => {
+    console.log('crash', items);
+    if (data.snake?.isChild(items[0])) {
+      data.snake?.stop();
+      // 游戏结束
+    }
+  });
 }
 </script>
 
@@ -104,9 +109,8 @@ function initSnake() {
   height: 100%;
   outline: none;
 
-  > canvas {
-    border: 1px solid #000;
-    box-sizing: content-box;
+  > div {
+    background: var(--background);
   }
 }
 </style>
