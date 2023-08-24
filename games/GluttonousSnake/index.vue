@@ -1,7 +1,15 @@
 <template>
-  <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus>
-    <div style="padding: 10px" :style="{width: canvasStyle.width + 20+'px', height: canvasStyle.height +  20+'px'}">
+  <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus="autofocus" @blur.stop="onSwitchState(true)">
+    <div class="var-GluttonousSnake__content" :style="{width: canvasStyle.width + 20 + 'px'}">
+      <div class="var-GluttonousSnake__header">
+        <div class="var-GluttonousSnake__header--item">食物：{{ game.score }}</div>
+        <div class="var-GluttonousSnake__header--item">时间：{{ game.runTime }}</div>
+      </div>
       <canvas ref="canvas" :width="canvasStyle.width" :height="canvasStyle.height" :style="{width: canvasStyle.width + 'px', height: canvasStyle.height + 'px'}"/>
+    </div>
+    <div class="var-tips" v-show="game.isStop" style="pointer-events: none;">
+      <div class="var-tips__header">提示</div>
+      <div class="var-tips__content">按下<span class="is-btn">空格键</span>可<span class="is-btn">开始/暂停</span>游戏</div>
     </div>
   </div>
 </template>
@@ -12,24 +20,26 @@ import { GameBackgroundBlock } from '@games/utils/Graphics.ts';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { Keyboard } from '@utils/keyboard.ts';
 import { Snake } from './utils/Graphics.ts';
-import { Create } from 'tig-core';
+import { Create, debounce } from 'tig-core';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
 
 const data = reactive<{
+  blockSize: number;
   core: Create | null;
   snake: Snake | null;
-  blockSize: number;
   keyBinding: Keyboard | null;
   border: { width: number; height: number; }
-}>({
-  core: null,
-  snake: null,
-  blockSize: 10,
-  keyBinding: null,
-  border: { width: 80, height: 40 },
-});
+}>({ core: null, snake: null, blockSize: 10, keyBinding: null, border: { width: 62, height: 32 } });
+
+const game = reactive<{
+  walls: any[];
+  score: number;
+  timer: number;
+  isStop: boolean;
+  runTime: string;
+}>({ score: 0, walls: [], timer: 190, runTime: '0', isStop: true });
 
 // 实际盒子大小
 const canvasStyle = computed(() => {
@@ -39,7 +49,10 @@ const canvasStyle = computed(() => {
 });
 
 onMounted(() => {
-  if (root.value) initKeyBinding(root.value);
+  if (root.value) {
+    root.value.focus();
+    initKeyBinding(root.value);
+  }
   if (canvas.value) initCreate(canvas.value);
 });
 
@@ -48,20 +61,17 @@ function initKeyBinding(dom: HTMLDivElement) {
   let timeout: NodeJS.Timeout | null = null;
 
   function setDirection(dir: 0 | 1 | 2 | 3) {
-    let timer = 0;
     return function () {
       if (!data.snake) return;
       const snake = data.snake;
-      if (!timer) timer = snake.timer;
-      const newTimer = 40;
+      const newTimer = 80;
       // 长按加速
       if (snake.direction === dir) {
         snake.timer = newTimer;
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(() => {
-          snake.timer = timer;
+          snake.timer = game.timer;
           timeout = null;
-          timer = 0;
         }, newTimer);
       }
       // 方向变更
@@ -73,6 +83,11 @@ function initKeyBinding(dom: HTMLDivElement) {
   data.keyBinding.on('ArrowDown', setDirection(1));
   data.keyBinding.on('ArrowLeft', setDirection(2));
   data.keyBinding.on('ArrowRight', setDirection(3));
+  // =====================================================
+  data.keyBinding.on('space', () => {
+    console.log('space');
+    onSwitchState(!game.isStop);
+  });
 }
 
 function initCreate(canvas: HTMLCanvasElement) {
@@ -81,6 +96,7 @@ function initCreate(canvas: HTMLCanvasElement) {
   data.core.on('FPS', console.log);
   // 添加背景
   data.core.insert(new GameBackgroundBlock(width, height, 10));
+  // 初始化边界
   data.core.run();
   // 初始化蛇
   initSnake();
@@ -90,27 +106,30 @@ function initCreate(canvas: HTMLCanvasElement) {
 function initSnake() {
   data.snake = new Snake(<Create>data.core, data.border, data.blockSize);
   data.snake.timer = 180;
-  const snakePoints = Array.from({ length: 10 }).map((_, i) => ({ x: 0, y: 10 - i }));
+  const snakePoints = Array.from({ length: 10 }).map((_, i) => ({ x: 1, y: i + 1 }));
   data.snake?.addChild(...snakePoints);
-  data.snake.start();
-  data.snake.on('crash', items => {
-    console.log('crash', items);
-    if (data.snake?.isChild(items[0])) {
-      data.snake?.stop();
-      // 游戏结束
-    }
-  });
+  data.snake.direction = 1;
+  data.snake.on('crash', hasCrashState);
 }
-</script>
 
-<style lang="scss">
-.var-GluttonousSnake {
-  width: 100%;
-  height: 100%;
-  outline: none;
-
-  > div {
-    background: var(--background);
+// =====================================================
+function hasCrashState(items: any[]) {
+  if (data.snake?.isChild(items[0])) {
+    // 游戏结束
+    onSwitchState(true);
   }
 }
-</style>
+
+const onSwitchState = debounce(function onSwitchState(isStop: boolean) {
+  game.isStop = isStop;
+  if (game.isStop) {
+    data.core?.stop();
+    data.snake?.stop();
+  } else {
+    data.core?.run();
+    data.snake?.start();
+  }
+}, 50);
+</script>
+
+<style lang="scss" src="./style.scss"/>

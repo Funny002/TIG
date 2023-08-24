@@ -1,0 +1,57 @@
+.var-GluttonousSnake {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  position: relative;
+  background: var(--background);
+
+  &__header {
+    color: #333;
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    letter-spacing: 2px;
+    padding-bottom: 10px;
+    justify-content: space-around;
+
+    &--item {
+      margin-right: 20px;
+    }
+  }
+
+  &__content {
+    padding: 10px;
+    margin: 0 auto;
+  }
+}
+
+.var-tips {
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10%;
+  height: 100%;
+  position: absolute;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.7);
+
+  &__header {
+    color: #fff;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  &__content {
+    color: #fff;
+    font-size: 14px;
+
+    .is-btn {
+      margin: 0 5px;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+      background-color: #4d4d4d;
+    }
+  }
+}
