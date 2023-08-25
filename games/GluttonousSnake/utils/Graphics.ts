@@ -1,8 +1,11 @@
-import { Create, Listener, getTime, AnimationFrame } from 'tig-core';
+import { Create, Listener, getTime, AnimationFrame, Shape } from 'tig-core';
 import { GameBlock } from '@games/utils/Graphics.ts';
-//     ctx.strokeStyle = '#777';
-//     if (this.head) {
-//       ctx.fillStyle = '#f66';
+
+// TODO: 蛇头颜色
+const headColor = '#e22';
+
+// TODO: 蛇身颜色
+const itemColor = '#000';
 
 // TODO: 蛇
 export class Snake {
@@ -71,7 +74,7 @@ export class Snake {
   }
 
   private handlerChild(snake: GameBlock) {
-    this.children[0]?.setColor('#000');
+    this.children[0]?.setColor(itemColor);
     this.children.unshift(snake);
     //
     const crash = this.core.crashDetection(snake);
@@ -83,10 +86,20 @@ export class Snake {
   public addChild(...points: { x: number, y: number }[]) {
     const list = points.map(({ x, y }) => this.handlerPoint(x, y));
     for (const item of list) {
-      this.handlerChild(new GameBlock(item.x, item.y, this.block, '#e22'));
+      this.handlerChild(new GameBlock(item.x, item.y, this.block, headColor));
     }
   }
 
+  // TODO: 自动添加子项
+  public autoAddChild(count: number) {
+    const { left, top } = this.children[this.length - 1] || {};
+    for (let i = 0; i < count; i++) {
+      const item = new GameBlock(left, top, this.block, itemColor);
+      this.children.push(item);
+      this.core.insert(item);
+    }
+  }
+  
   // TODO: 删除子项
   public removeChild(count: number = 1, index?: number) {
     index = typeof index === 'number' ? index : this.length - count;
@@ -152,6 +165,11 @@ export class Snake {
     AnimationFrame(this.startMove.bind(this));
   }
 
+  public getSnakeMap() {
+    const newBlock = this.block + 1;
+    return this.children.map(item => ({ x: item.left / newBlock, y: item.top / newBlock }));
+  }
+
   // TODO: 开始
   public start() {
     this.lestTime = getTime();
@@ -177,5 +195,40 @@ export class Snake {
   // TODO: 取消监听
   public off(key: 'move' | 'crash', listener: (data: any) => void) {
     this.listener.unsubscribe(key, listener);
+  }
+}
+
+// TODO: 分数方块 - 创建 ·Shape· 子类
+export class ScoreBlock extends Shape {
+  private color: string;
+  private readonly width: number;
+
+  constructor(left: number, top: number, width: number, color: string = '#849374') {
+    super();
+    this.top = top;
+    this.left = left;
+    this.width = width;
+    this.color = color;
+    this.update();
+  }
+
+  get size() {
+    const width = this.width;
+    return { width, height: width };
+  }
+
+  // TODO: 改变颜色
+  setColor(color: string) {
+    this.color = color;
+    this.update();
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.translate(this.width / 2, this.width / 2);
+    ctx.rotate(45 * Math.PI / 180);
+    const newBlock = this.width - 4;
+    const point = -Math.round(newBlock / 2);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(point, point, newBlock, newBlock);
   }
 }
