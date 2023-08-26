@@ -1,4 +1,4 @@
-import { Create, Listener, getTime, AnimationFrame, Shape } from 'tig-core';
+import { Create, Listener, getTime, AnimationFrame } from 'tig-core';
 import { GameBlock } from '@games/utils/Graphics.ts';
 
 // TODO: 蛇头颜色
@@ -99,7 +99,7 @@ export class Snake {
       this.core.insert(item);
     }
   }
-  
+
   // TODO: 删除子项
   public removeChild(count: number = 1, index?: number) {
     index = typeof index === 'number' ? index : this.length - count;
@@ -199,28 +199,9 @@ export class Snake {
 }
 
 // TODO: 分数方块 - 创建 ·Shape· 子类
-export class ScoreBlock extends Shape {
-  private color: string;
-  private readonly width: number;
-
+export class ScoreBlock extends GameBlock {
   constructor(left: number, top: number, width: number, color: string = '#849374') {
-    super();
-    this.top = top;
-    this.left = left;
-    this.width = width;
-    this.color = color;
-    this.update();
-  }
-
-  get size() {
-    const width = this.width;
-    return { width, height: width };
-  }
-
-  // TODO: 改变颜色
-  setColor(color: string) {
-    this.color = color;
-    this.update();
+    super(left, top, width, color);
   }
 
   draw(ctx: CanvasRenderingContext2D) {

@@ -13,8 +13,8 @@ function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 
 
 // TODO: 游戏方块 - 创建 ·Shape· 子类
 export class GameBlock extends Shape {
-  private color: string;
-  private readonly width: number;
+  protected color: string;
+  protected readonly width: number;
 
   constructor(left: number, top: number, width: number, color: string = '#849374') {
     super();
