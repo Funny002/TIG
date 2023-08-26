@@ -13,7 +13,7 @@ const GluttonousSnake = defineAsyncComponent(() => import('@games/GluttonousSnak
 
 // 游戏路由
 export const GameRoutes: RoutesRaw[] = [
-  { path: 'GluttonousSnake', name: 'Gluttonous Snake', version: '0.0.1', component: GluttonousSnake },
+  { path: 'GluttonousSnake', name: 'Gluttonous Snake', version: '1.0.0', component: GluttonousSnake },
 ];
 
 // 页面路由

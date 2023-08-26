@@ -2,8 +2,10 @@
   <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus="autofocus" @blur.stop="onSwitchState(true)">
     <div class="var-GluttonousSnake__content" :style="{width: canvasStyle.width + 20 + 'px'}">
       <div class="var-GluttonousSnake__header">
-        <div class="var-GluttonousSnake__header--item">食物：{{ game.score }}</div>
         <div class="var-GluttonousSnake__header--item">时间：{{ numberToDate(game.runTime) }}</div>
+        <div class="var-GluttonousSnake__header--item">食物：{{ game.score }}</div>
+        <div class="var-GluttonousSnake__header--item">速度：{{ data.snake?.timer }}ms/格</div>
+        <div class="var-GluttonousSnake__header--item">FPS：{{ data.fps }}</div>
       </div>
       <canvas ref="canvas" :width="canvasStyle.width" :height="canvasStyle.height" :style="{width: canvasStyle.width + 'px', height: canvasStyle.height + 'px'}"/>
     </div>
@@ -34,6 +36,7 @@ const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
 
 interface DataState {
+  fps: number;
   blockSize: number;
   core: Create | null;
   snake: Snake | null;
@@ -59,9 +62,9 @@ interface GameTimeState {
   timeout: NodeJS.Timeout | null;
 }
 
-const data = reactive<DataState>({ core: null, snake: null, blockSize: 10, keyBinding: null, border: { width: 52, height: 32 } });
+const data = reactive<DataState>({ core: null, snake: null, blockSize: 10, keyBinding: null, border: { width: 52, height: 32 }, fps: 0 });
 
-const game = reactive<GameState>({ score: 0, walls: [], timer: 190, over: false, isStop: true, runTime: 0, scoreBlock: null, scoreMap: new Map() });
+const game = reactive<GameState>({ score: 0, walls: [], timer: 280, over: false, isStop: true, runTime: 0, scoreBlock: null, scoreMap: new Map() });
 const gameTime = reactive<GameTimeState>({ start: 0, pause: 0, total: 0, timeout: null });
 
 // 实际盒子大小
@@ -87,7 +90,7 @@ function initKeyBinding(dom: HTMLDivElement) {
     return function () {
       if (!data.snake) return;
       const snake = data.snake;
-      const newTimer = 80;
+      const newTimer = game.timer - Math.ceil(game.timer / 3);
       // 长按加速
       if (snake.direction === dir) {
         snake.timer = newTimer;
@@ -115,7 +118,8 @@ function initKeyBinding(dom: HTMLDivElement) {
 
 function initCreate(canvas: HTMLCanvasElement) {
   const { width, height } = canvasStyle.value;
-  data.core = new Create(canvas, canvasStyle.value);
+  data.core = new Create(canvas, { width, height, limitFps: 60 });
+  data.core.on('FPS', fps => data.fps = fps);
   data.core.on('FPS', console.log);
   // 添加背景
   data.core.insert(new GameBackgroundBlock(width, height, 10));
@@ -125,6 +129,8 @@ function initCreate(canvas: HTMLCanvasElement) {
   data.core.run();
   // 初始化蛇
   initSnake();
+  // 暂停画布运转
+  setTimeout(() => data.core?.stop(), 100);
   // 开始记录时间
   gameTime.timeout = setInterval(() => {
     const { start, pause, total } = gameTime;
@@ -137,9 +143,10 @@ function initCreate(canvas: HTMLCanvasElement) {
     }
     // 蛇存在
     if (data.snake) {
-      if (game.runTime > 180 && game.runTime % 180 === 1) {
+      if (game.runTime > 59 && game.runTime % 60 === 0) {
         game.timer = Math.max(40, game.timer - 10);
         data.snake.timer = game.timer;
+        console.log(data.snake.timer);
       }
     }
   }, 1000);
