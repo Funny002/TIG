@@ -51,7 +51,7 @@ export const TetrisMap: { [key in TetrisTypes]: { x: number; y: number }[][] } =
 // TODO: 图形形状
 export class TetrisModel extends Shape {
   // TODO: 形状
-  protected readonly types: TetrisTypes;
+  private readonly types: TetrisTypes;
 
   // TODO: 格子大小
   private readonly block: number;
@@ -63,7 +63,7 @@ export class TetrisModel extends Shape {
   private readonly width: number;
 
   // TODO: 旋转
-  protected rotate: number = 0;
+  private rotate: number = 0;
 
   constructor(type: TetrisTypes, block: number, color: string = '#000') {
     super();
@@ -85,24 +85,27 @@ export class TetrisModel extends Shape {
     return this.types === 'O' ? 1 : 4;
   }
 
-  get children() {
-    const { types, rotate } = this;
-    return TetrisMap[types][rotate] || [];
+  // TODO: 获取子项
+  getChildren(rotate: number | null = null) {
+    rotate = (null == rotate ? this.rotate : rotate) % this.zee;
+    return TetrisMap[this.types][rotate] || [];
   }
 
   // TODO: 设置旋转
   setRotate(rotate: number) {
-    this.rotate = rotate % this.zee;
+    rotate = rotate % this.zee;
+    this.rotate = rotate >= 0 ? rotate : 4 + rotate;
     this.update();
   }
 
-  // TODO: 旋转 + 1
-  onRotate() {
-    this.setRotate(this.rotate + 1);
+  // TODO: 旋转 - 默认，右旋
+  onRotate(right: boolean = true) {
+    this.setRotate(this.rotate + (right ? 1 : -1));
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    const { block, color, children } = this;
+    const { block, color } = this;
+    const children = this.getChildren();
     const BlockCanvas = new GraphsCanvas(block, block);
     drawBlock(BlockCanvas.context, block, 0, 0, color);
     //
