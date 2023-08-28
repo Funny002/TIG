@@ -1,6 +1,6 @@
 <template>
   <div class="var-GluttonousSnake" ref="root" tabindex="1" autofocus="autofocus" @blur.stop="onSwitchState(true)">
-    <div class="var-GluttonousSnake__content" :style="{width: canvasStyle.width + 20 + 'px'}">
+    <div class="var-GluttonousSnake__content">
       <div class="var-GluttonousSnake__header">
         <div class="var-GluttonousSnake__header--item">时间：{{ numberToDate(game.runTime) }}</div>
         <div class="var-GluttonousSnake__header--item">食物：{{ game.score }}</div>
@@ -27,10 +27,10 @@
 <script setup lang="ts">
 import { GameBackgroundBlock, GameBlock } from '@games/utils/Graphics.ts';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { Keyboard } from '@utils/keyboard.ts';
-import { Create, debounce } from 'tig-core';
 import { ScoreBlock, Snake } from './utils/Graphics.ts';
+import { Keyboard } from '@utils/keyboard.ts';
 import { randomNum } from '@utils/random.ts';
+import { Create, debounce } from 'tig-core';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
@@ -255,4 +255,4 @@ function numberToDate(value: number) {
 }
 </script>
 
-<style lang="scss" src="./style.scss"/>
+<style scoped lang="scss" src="./style.scss"/>

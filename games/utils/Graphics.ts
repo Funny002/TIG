@@ -1,7 +1,7 @@
 import { Shape, GraphsCanvas } from 'tig-core';
 
 // TODO: 绘制基础方块
-function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 0, top: number = 0, color: string = '#849374') {
+export function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 0, top: number = 0, color: string = '#849374') {
   ctx.lineWidth = 1;
   ctx.fillStyle = color;
   ctx.strokeStyle = color;

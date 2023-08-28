@@ -10,10 +10,12 @@ export interface MenuItem {
 
 // 贪吃蛇
 const GluttonousSnake = defineAsyncComponent(() => import('@games/GluttonousSnake/index.vue'));
+const Tetris = defineAsyncComponent(() => import('@games/Tetris/index.vue'));
 
 // 游戏路由
 export const GameRoutes: RoutesRaw[] = [
   { path: 'GluttonousSnake', name: 'Gluttonous Snake', version: '1.0.0', component: GluttonousSnake },
+  { path: 'Tetris', name: 'Tetris', version: '0.0.1', component: Tetris },
 ];
 
 // 页面路由

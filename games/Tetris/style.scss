@@ -1,0 +1,13 @@
+.var-Tetris {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  position: relative;
+  background: var(--background);
+
+  &__content {
+    padding: 10px;
+    margin: 0 auto;
+    display: table;
+  }
+}
