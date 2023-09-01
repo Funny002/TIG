@@ -1,6 +1,17 @@
+::-webkit-scrollbar {
+  $width: 6px;
+  width: $width;
+  height: $width;
+
+  &-thumb {
+    width: $width;
+    height: $width;
+    border-radius: $width;
+    background-color: #ddd;
+  }
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 

@@ -1,0 +1,48 @@
+.var-Breadcrumb {
+  height: 30px;
+  display: flex;
+  cursor: default;
+  line-height: 30px;
+  align-items: center;
+
+  &__content {
+    padding: 0 5px;
+
+    &.is-router {
+      cursor: pointer;
+
+      &:hover {
+        color: #48f;
+      }
+    }
+  }
+
+  &__separator {
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+
+    &:last-child {
+      color: #000;
+
+      .var-Breadcrumb {
+        &__content {
+          font-weight: bold;
+        }
+
+        &__separator {
+          display: none;
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@
   "author": "Funny002<2048412928@qq.com>",
   "description": "I's Template description",
   "file": {
-    "update": "public/update.md",
-    "description": "public/index.md"
+    "update": "public/update",
+    "description": "public/index"
   }
 }

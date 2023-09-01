@@ -1,5 +1,3 @@
-import { defineAsyncComponent } from 'vue';
-
 // TODO: 配置处理
 function handlerGameConfig(config: GameConfig) {
   for (const key of ['home', 'name', 'mkdir']) {
@@ -21,9 +19,6 @@ export const gameModules = (function () {
     return handlerGameConfig(Object.assign({}, config, { mkdir: (keys.match(/\.\/(\w+)\/config.json/) || [])[1] }));
   }).filter(Boolean) as GameConfig[];
 })();
-
-// TODO: 路由
-export const GameRouter = gameModules.map(({ home, name, mkdir }) => ({ name, path: name, component: defineAsyncComponent(() => import(`./${ mkdir }/${ home }`)) }));
 
 // TODO: 菜单
 export const GameMenu = gameModules.map(({ name, icon, file, author, version, mkdir }) => ({ name, author, version, isDocs: Boolean(file?.description), logo: icon && new URL(`./${ mkdir }/${ icon }?url`, import.meta.url).href }));

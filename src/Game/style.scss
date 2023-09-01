@@ -1,0 +1,10 @@
+.var-Docs {
+  height: var(--height);
+
+  &__Content {
+    padding: 45px;
+    overflow: hidden auto;
+    border-top: 1px solid #ddd;
+    height: calc(var(--height) - 30px);
+  }
+}

@@ -21,11 +21,12 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
+      "@/*": ["src/*"],
       "@games/*": ["games/*"],
       "@utils": ["src/utils"],
       "@views/*": ["src/views/*"],
       "@utils/*": ["src/utils/*"],
-      "@layout/*": ["src/layout/*"]
+      "@modules/*": ["src/components/*"],
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "games/**/*.ts", "games/**/*.d.ts", "games/**/*.tsx", "games/**/*.vue"],

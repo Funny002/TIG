@@ -9,10 +9,11 @@ export default defineConfig({
   publicDir: './public',
   resolve: {
     alias: {
+      '@': resolve(__dirname, 'src'),
       '@games': resolve(__dirname, 'games'),
       '@utils': resolve(__dirname, 'src/utils'),
       '@views': resolve(__dirname, 'src/views'),
-      '@layout': resolve(__dirname, 'src/layout'),
+      '@modules': resolve(__dirname, 'src/components'),
     },
   },
 });
