@@ -6,6 +6,7 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [vue()],
   cacheDir: './cache',
+  publicDir: './public',
   resolve: {
     alias: {
       '@games': resolve(__dirname, 'games'),

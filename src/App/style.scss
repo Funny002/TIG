@@ -1,0 +1,133 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: #999;
+  font-size: 14px;
+  background-color: #f3f4f6;
+}
+
+.var-App {
+  margin: 20px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: calc(100vw - 40px);
+  height: calc(100vh - 40px);
+  --width: calc(100vw - 42px);
+  --height: calc(100vh - 42px);
+
+  &__side {
+    z-index: 1;
+    width: 240px;
+    overflow: hidden;
+    position: absolute;
+    height: var(--height);
+    border-right: 1px solid #ddd;
+  }
+
+  &__content {
+    overflow: hidden;
+    position: relative;
+    border-radius: 6px;
+    width: var(--width);
+    padding-left: 240px;
+    height: var(--height);
+  }
+}
+
+/** side_item **/
+.var-App__side-item {
+  height: 50px;
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  position: relative;
+  align-items: center;
+  padding: 0 10px 0 5px;
+  border-bottom: 1px solid #ddd;
+
+  &--avatar {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    overflow: hidden;
+    border-radius: 6px;
+
+    > img {
+      width: 40px;
+      height: 40px;
+      display: block;
+      line-height: 0;
+    }
+  }
+
+  &--body {
+    padding-left: 5px;
+    width: calc(100% - 40px);
+  }
+
+  &--user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &--name {
+    color: #000;
+    font-weight: bold;
+    line-height: 22px;
+  }
+
+  &--version,
+  &--author {
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  &--run {
+    top: 0;
+    right: 0;
+    color: #fff;
+    height: 50px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    transition: transform .3s;
+    border-radius: 6px 0 0 6px;
+    transform: translate(100%, 0);
+
+    &_item {
+      padding: 0 10px;
+    }
+
+    &_icon {
+      height: 30px;
+      padding-top: 8px;
+      text-align: center;
+
+      > svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    &_text {
+      font-size: 10px;
+      line-height: 20px;
+      text-align: center;
+    }
+  }
+
+  &:hover {
+    background-color: #f1f1f1;
+  }
+
+  &:hover &--run {
+    cursor: pointer;
+    transform: translate(0, 0);
+  }
+}

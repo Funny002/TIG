@@ -12,12 +12,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "marked": "^7.0.5",
     "tig-core": "^1.1.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {
     "@types/color": "^3.0.3",
     "@types/crypto-js": "^4.1.1",
+    "@types/marked": "^5.0.1",
     "@types/node": "^20.4.5",
     "@vitejs/plugin-vue": "^4.2.3",
     "color": "^4.2.3",

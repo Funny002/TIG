@@ -12,7 +12,7 @@ import { GameBackgroundBlock } from '@games/utils/Graphics.ts';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { Keyboard } from '@utils/keyboard.ts';
 import { Create } from 'tig-core';
-import { ShapeModel } from '@games/Tetris/utils/Graphics.ts';
+import { ShapeModel } from '@games/backup/Tetris/utils/Graphics.ts';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
@@ -77,4 +77,4 @@ function onSwitchState(state: boolean) {
 }
 </script>
 
-<style scoped lang="scss" src="./style.scss"/>
+<style scoped lang="scss" src="style.scss"/>
