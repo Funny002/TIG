@@ -158,14 +158,20 @@ function setScoreBlock() {
   const list = Array.from(game.scoreMap.keys()).filter(key => !snakeMap.includes(key));
   const [x, y] = list[randomNum(0, list.length - 1)].split('-').map(Number);
   const newBlock = data.blockSize + 1;
-  if (!game.scoreBlock) {
-    game.scoreBlock = new ScoreBlock(x * newBlock, y * newBlock, data.blockSize, '#f00');
+  const scoreBlock = game.scoreBlock ? game.scoreBlock : game.scoreBlock = new ScoreBlock(x * newBlock, y * newBlock, data.blockSize, '#f00');
+  if (scoreBlock.parent) {
+    scoreBlock.top = y * newBlock;
+    scoreBlock.left = x * newBlock;
+    scoreBlock.removeChild(scoreBlock.index);
   } else {
-    game.scoreBlock.top = y * newBlock;
-    game.scoreBlock.left = x * newBlock;
-    game.scoreBlock.removeChild(game.scoreBlock.index);
+    setInterval(() => {
+      scoreBlock.visible = false;
+      setTimeout(() => {
+        scoreBlock.visible = true;
+      }, 200);
+    }, 800);
   }
-  data.core?.insert(<any>game.scoreBlock);
+  data.core?.insert(<any>scoreBlock);
 }
 
 function initBorder(core: Create) {

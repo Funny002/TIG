@@ -76,5 +76,6 @@ function initCreate(canvas: HTMLCanvasElement) {
 
 // =====================================================
 function onSwitchState(state: boolean) {
+  console.log(state);
 }
 </script>
