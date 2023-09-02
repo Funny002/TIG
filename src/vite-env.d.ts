@@ -10,3 +10,14 @@ interface GameConfig {
   description?: string;
   file: Partial<{ update: string; description: string; }>;
 }
+
+export default {};
+
+declare global {
+  interface Window {
+    __CONFIG__: {
+      title: string;
+      version: string;
+    };
+  }
+}

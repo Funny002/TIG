@@ -9,12 +9,15 @@
 <script lang="ts">export default { name: 'Tetris' };</script>
 <script setup lang="ts">
 import { GameBackgroundBlock } from '@games/utils/Graphics.ts';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, inject } from 'vue';
 import { Keyboard } from '@utils/keyboard.ts';
 import { Create } from 'tig-core';
 
 const root = ref<HTMLDivElement>();
 const canvas = ref<HTMLCanvasElement>();
+
+const themeConfig = inject<{ block: number; color: string; active: string; background: string; }>('theme');
+console.log(themeConfig);
 
 interface DataState {
   // fps: number;
@@ -75,5 +78,3 @@ function initCreate(canvas: HTMLCanvasElement) {
 function onSwitchState(state: boolean) {
 }
 </script>
-
-<style scoped lang="scss" src="style.scss"/>

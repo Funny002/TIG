@@ -13,9 +13,13 @@ const router = createRouter({
         { name: 'Game', path: 'game/:name', component: () => import('@/Game/index.vue') },
       ],
     },
-    // { name: 'Games', path: '/games', component: () => import('@layout/games.vue'), children: GameRouter },
     { name: 'Error', path: '/:pathMatch(.*)*', component: () => import('@views/Error/index.vue') },
   ],
+});
+
+router.beforeEach((_, __, next) => {
+  document.title = window.__CONFIG__.title;
+  next();
 });
 
 export default router;

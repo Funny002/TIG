@@ -1,68 +1,93 @@
 <template>
   <div class="var-Game">
-    <!--    <div class="var-Docs__Error" v-if="data.isError"></div>-->
-    <!--    <div class="var-Docs__body" v-else>-->
-    <!--      <var-breadcrumb :data="[{name: '首页', router: '/home'}, data.name, {name: '文档', router: `/docs/${data.name}`}, data.path]">-->
-    <!--        <template #separator>-->
-    <!--          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">-->
-    <!--            <path d="M340.864 149.312a30.592 30.592 0 0 0 0 42.752L652.736 512 340.864 831.872a30.592 30.592 0 0 0 0 42.752 29.12 29.12 0 0 0 41.728 0L714.24 534.336a32 32 0 0 0 0-44.672L382.592 149.376a29.12 29.12 0 0 0-41.728 0z"></path>-->
-    <!--          </svg>-->
-    <!--        </template>-->
-    <!--      </var-breadcrumb>-->
-    <!--      <div class="var-Docs__Content markdown-body" v-html="data.content"/>-->
-    <!--    </div>-->
+    <var-error v-if="data.isError"/>
+    <template v-else>
+      <div class="var-Game__header">
+        <div class="var-Game__header--icon" @click.stop="onRouter('/home')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#000" viewBox="0 0 16 16">
+            <path d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+        </div>
+        <div class="var-Game__header--avatar">
+          <img :src="data.logo" alt="logo">
+        </div>
+        <div class="var-Game__header--body">
+          <div class="var-Game__header--user">
+            <div class="var-Game__header--name">{{ GameInfo.name }}</div>
+            <template v-if="GameInfo.author">
+              <span style="padding: 0 3px;">#</span>
+              <div class="var-Game__header--author">{{ GameInfo.author }}</div>
+            </template>
+          </div>
+          <div class="var-Game__header--description">{{ GameInfo.description }}</div>
+        </div>
+        <div class="var-Game__header--version">
+          <div class="var-Game__header--version-text">version:</div>
+          <div class="var-Game__header--version-value">{{ GameInfo.version }}</div>
+        </div>
+      </div>
+      <div class="var-Game__body">
+        <var-error v-if="!data.component"/>
+        <component v-else :is="data.component"/>
+      </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts"> export default { name: 'Docs' };</script>
 <script setup lang="ts">
-// import VarBreadcrumb from '@modules/Breadcrumb/index.vue';
-// import { onMounted, reactive, watch } from 'vue';
-// import { gameModules } from '@games/index.ts';
-// import { useRoute } from 'vue-router';
-// import { marked } from 'marked';
+import VarError from '@modules/Error/index.vue';
+import VarLoading from '@modules/Loading/index.vue';
 //
-// import 'github-markdown-css/github-markdown.css';
-//
-// const route = useRoute();
-// const gameKeys = gameModules.map(({ name }) => name);
-// const data = reactive({
-//   isError: false,
-//   content: '',
-//   name: '',
-//   path: '',
-//   breadcrumb: [
-//     {},
-//   ],
-// });
-//
-// onMounted(initPageFile);
-// watch(route, initPageFile);
-//
-// function handlePath(item: any) {
-//   return `${ item.mkdir }/${ item.file.description }`;
-// }
-//
-// async function initPageFile() {
-//   data.name = (route.params.name || '') as string;
-//   data.isError = !gameKeys.includes(data.name);
-//   if (data.isError) return;
-//   const item = gameModules.find(({ name }) => name === data.name);
-//   if (!item) return data.isError = true;
-//   if (data.isError) return;
-//   try {
-//     const path = `../../games/${ handlePath(item) }.md?raw`;
-//     data.path = (path.match(/\/(\w+)\.md/) || [])[1] || '';
-//     /* @vite-ignore */
-//     const content = await import(path);
-//     data.content = marked.parse(content.default || content, {
-//       breaks: true,
-//       gfm: true,
-//     });
-//   } catch (e) {
-//     data.isError = true;
-//   }
-// }
+import { computed, onMounted, reactive, watch, defineAsyncComponent, provide } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { gameModules } from '@games/index.ts';
+
+const route = useRoute();
+const router = useRouter();
+const gameKeys = gameModules.map(({ name }) => name);
+const data = reactive<any>({ logo: '', item: null, isError: false, component: null });
+const GameInfo = computed(() => (data.item || {}));
+
+onMounted(initPageFile);
+watch(route, initPageFile);
+
+function handlePath(item: any) {
+  return `${ item.mkdir }/${ item.home }`;
+}
+
+provide('theme', {
+  block: 12,
+  color: '#879372',
+  active: '#000000',
+  background: '#9ead86',
+});
+
+async function initPageFile() {
+  const name = (route.params.name || '') as string;
+  data.isError = !gameKeys.includes(name);
+  if (data.isError) return;
+  data.item = gameModules.find(({ name: key }) => key === name);
+  if (!Boolean(data.item)) return data.isError = true;
+  if (data.isError) return;
+  try {
+    data.logo = new URL(`../../games/${ data.item.mkdir }/${ data.item.icon }`, import.meta.url).href;
+    const path = `../../games/${ handlePath(data.item) }.vue`;
+    data.component = defineAsyncComponent({
+      delay: 300,
+      errorComponent: VarError,
+      loader: () => import(/* @vite-ignore */ path),
+      loadingComponent: VarLoading,
+    });
+    document.title = `${ data.item.name }|${ window.__CONFIG__.title }`;
+  } catch (e) {
+    data.isError = true;
+  }
+}
+
+function onRouter(path: string) {
+  router.push({ path });
+}
 </script>
 
 <style lang="scss" scoped src="./style.scss"/>

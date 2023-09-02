@@ -1,6 +1,6 @@
 <template>
   <div class="var-Docs">
-    <div class="var-Docs__Error" v-if="data.isError"></div>
+    <var-error v-if="data.isError"/>
     <div class="var-Docs__body" v-else>
       <var-breadcrumb :data="[{name: '首页', router: '/home'}, data.name, {name: '文档', router: `/docs/${data.name}`}, data.path]">
         <template #separator>
@@ -16,30 +16,25 @@
 
 <script lang="ts"> export default { name: 'Docs' };</script>
 <script setup lang="ts">
+import VarError from '@modules/Error/index.vue';
 import VarBreadcrumb from '@modules/Breadcrumb/index.vue';
+//
 import { onMounted, reactive, watch } from 'vue';
 import { gameModules } from '@games/index.ts';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
-
+//
 import 'github-markdown-css/github-markdown.css';
 
 const route = useRoute();
 const gameKeys = gameModules.map(({ name }) => name);
-const data = reactive({
-  isError: false,
-  content: '',
-  name: '',
-  path: '',
-  breadcrumb: [
-    {},
-  ],
-});
+const data = reactive({ name: '', path: '', content: '', isError: false });
 
 onMounted(initPageFile);
 watch(route, initPageFile);
 
 function handlePath(item: any) {
+  console.log(JSON.stringify(route));
   return `${ item.mkdir }/${ item.file.description }`;
 }
 
@@ -53,12 +48,9 @@ async function initPageFile() {
   try {
     const path = `../../games/${ handlePath(item) }.md?raw`;
     data.path = (path.match(/\/(\w+)\.md/) || [])[1] || '';
-    /* @vite-ignore */
-    const content = await import(path);
-    data.content = marked.parse(content.default || content, {
-      breaks: true,
-      gfm: true,
-    });
+    const content = await import(/* @vite-ignore */ path);
+    data.content = marked.parse(content.default || content, { breaks: true, gfm: true });
+    document.title = `${ item.name } - 文档|${ window.__CONFIG__.title }`;
   } catch (e) {
     data.isError = true;
   }

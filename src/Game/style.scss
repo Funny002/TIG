@@ -1,10 +1,76 @@
-.var-Docs {
+.var-Game {
   height: var(--height);
 
-  &__Content {
-    padding: 45px;
-    overflow: hidden auto;
-    border-top: 1px solid #ddd;
-    height: calc(var(--height) - 30px);
+  &__header {
+    display: flex;
+    height: 60px;
+    padding: 0 10px;
+    user-select: none;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+
+    &--icon {
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &--avatar,
+    &--avatar > img {
+      width: 40px;
+      height: 40px;
+    }
+
+    &--avatar {
+      overflow: hidden;
+      margin-left: 10px;
+      border-radius: 6px;
+
+      > img {
+        display: block;
+        line-height: 0;
+      }
+    }
+
+    &--body {
+      padding-left: 10px;
+    }
+
+    &--user {
+      display: flex;
+      height: 25px;
+      align-items: end;
+      line-height: 25px;
+    }
+
+    &--name {
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    &--author {
+      font-size: 12px;
+    }
+
+    &--description {
+      line-height: 22px;
+    }
+
+    &--version {
+      display: flex;
+      margin-left: auto;
+      align-items: center;
+    }
+  }
+
+  &__body {
+    background-color: #9ead86;
+    height: calc(var(--height) - 60px);
   }
 }
