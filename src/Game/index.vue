@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div class="var-Game__header--avatar">
-          <img :src="data.logo" alt="logo">
+          <img :src="GameInfo.logo" alt="logo">
         </div>
         <div class="var-Game__header--body">
           <div class="var-Game__header--user">
@@ -37,24 +37,20 @@
 <script lang="ts"> export default { name: 'Docs' };</script>
 <script setup lang="ts">
 import VarError from '@modules/Error/index.vue';
-import VarLoading from '@modules/Loading/index.vue';
 //
-import { computed, onMounted, reactive, watch, defineAsyncComponent, provide } from 'vue';
+import { computed, onMounted, reactive, watch, provide, markRaw } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { gameModules } from '@games/index.ts';
+import { GameModules } from '@games/index.ts';
 
 const route = useRoute();
 const router = useRouter();
-const gameKeys = gameModules.map(({ name }) => name);
-const data = reactive<any>({ logo: '', item: null, isError: false, component: null });
+
+const data = reactive<any>({ isError: false, item: null, component: null });
+
 const GameInfo = computed(() => (data.item || {}));
 
 onMounted(initPageFile);
 watch(route, initPageFile);
-
-function handlePath(item: any) {
-  return `${ item.mkdir }/${ item.home }`;
-}
 
 provide('theme', {
   block: 12,
@@ -64,21 +60,12 @@ provide('theme', {
 });
 
 async function initPageFile() {
-  const name = (route.params.name || '') as string;
-  data.isError = !gameKeys.includes(name);
-  if (data.isError) return;
-  data.item = gameModules.find(({ name: key }) => key === name);
-  if (!Boolean(data.item)) return data.isError = true;
-  if (data.isError) return;
   try {
-    data.logo = new URL(`../../games/${ data.item.mkdir }/${ data.item.icon }`, import.meta.url).href;
-    const path = `../../games/${ handlePath(data.item) }.vue`;
-    data.component = defineAsyncComponent({
-      delay: 300,
-      errorComponent: VarError,
-      loader: () => import(/* @vite-ignore */ path),
-      loadingComponent: VarLoading,
-    });
+    const name = (route.params.name || '') as string;
+    const item = GameModules[name];
+    if (!item) return data.isError = true;
+    data.item = item.config;
+    data.component = markRaw(item.modules);
     document.title = `${ data.item.name }|${ window.__CONFIG__.title }`;
   } catch (e) {
     data.isError = true;

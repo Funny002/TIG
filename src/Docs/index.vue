@@ -9,7 +9,7 @@
           </svg>
         </template>
       </var-breadcrumb>
-      <div class="var-Docs__Content markdown-body" v-html="data.content"/>
+      <div class="var-Docs__Content markdown-body" v-html="data.content" @click.stop="onClick"/>
     </div>
   </div>
 </template>
@@ -20,39 +20,43 @@ import VarError from '@modules/Error/index.vue';
 import VarBreadcrumb from '@modules/Breadcrumb/index.vue';
 //
 import { onMounted, reactive, watch } from 'vue';
-import { gameModules } from '@games/index.ts';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { GameModules } from '@games/index.ts';
 import { marked } from 'marked';
 //
 import 'github-markdown-css/github-markdown.css';
 
 const route = useRoute();
-const gameKeys = gameModules.map(({ name }) => name);
-const data = reactive({ name: '', path: '', content: '', isError: false });
+const router = useRouter();
+const data = reactive({ name: '', path: '', content: '', markdown: {}, isError: false });
 
 onMounted(initPageFile);
 watch(route, initPageFile);
 
-function handlePath(item: any) {
-  console.log(JSON.stringify(route));
-  return `${ item.mkdir }/${ item.file.description }`;
-}
-
 async function initPageFile() {
-  data.name = (route.params.name || '') as string;
-  data.isError = !gameKeys.includes(data.name);
-  if (data.isError) return;
-  const item = gameModules.find(({ name }) => name === data.name);
-  if (!item) return data.isError = true;
-  if (data.isError) return;
   try {
-    const path = `../../games/${ handlePath(item) }.md?raw`;
-    data.path = (path.match(/\/(\w+)\.md/) || [])[1] || '';
-    const content = await import(/* @vite-ignore */ path);
-    data.content = marked.parse(content.default || content, { breaks: true, gfm: true });
-    document.title = `${ item.name } - 文档|${ window.__CONFIG__.title }`;
+    data.name = (route.params.name || '') as string;
+    const item = GameModules[data.name];
+    if (!item) return data.isError = true;
+    data.path = (route.query.path as string) || item.config.markdown;
+    //
+    data.content = marked.parse(item.markdown[data.path], { breaks: true, gfm: true });
+    document.title = `${ data.name } - 文档|${ window.__CONFIG__.title }`;
   } catch (e) {
     data.isError = true;
+  }
+}
+
+function handlerPath(path: string) {
+  return path.split('/').filter(item => item !== '.').join('/');
+}
+
+function onClick(event: Event) {
+  const target = event.target as HTMLElement;
+  if (target.tagName === 'A') {
+    event.preventDefault();
+    const src = handlerPath(target.getAttribute('href') || '');
+    router.push({ path: route.path, query: { path: src ? `./${ src }` : '' } });
   }
 }
 </script>

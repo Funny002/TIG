@@ -1,6 +1,6 @@
-import { drawBlock } from '@games/utils/Graphics.ts';
-import { GraphsCanvas, Shape } from 'tig-core';
+import { drawBlock, MoveGraphics } from '@games/utils/Graphics.ts';
 import { randomNum } from '@utils/random.ts';
+import { GraphsCanvas } from 'tig-core';
 
 // TODO: 形状
 type TetrisTypes = 'S' | 'Z' | 'L' | 'I' | 'O' | 'T' | 'J';
@@ -49,7 +49,7 @@ export const TetrisMap: { [key in TetrisTypes]: { x: number; y: number }[][] } =
 };
 
 // TODO: 图形形状
-export class TetrisModel extends Shape {
+export class TetrisModel extends MoveGraphics {
   // TODO: 形状
   private readonly types: TetrisTypes;
 
@@ -113,6 +113,9 @@ export class TetrisModel extends Shape {
     for (const point of children) {
       ctx.drawImage(BlockCanvas.canvas, point.x * newBlock, point.y * newBlock);
     }
+  }
+
+  move() {
   }
 }
 

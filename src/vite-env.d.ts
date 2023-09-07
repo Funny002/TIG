@@ -3,15 +3,33 @@
 export default {};
 
 declare global {
+  import { App } from 'vue';
+
   interface GameConfig {
-    home: string;
     name: string;
-    icon?: string;
-    mkdir: string;
+    author: string;
     version: string;
-    author?: string;
-    description?: string;
-    file: Partial<{ update: string; description: string; }>;
+    description: string;
+    //
+    main: string;
+    logo: string;
+    markdown: {
+      main: string;
+      mkdir: string;
+    },
+  }
+
+  interface GameModule {
+    config: {
+      logo: string;
+      name: string;
+      author: string;
+      version: string;
+      markdown: string;
+      description: string;
+    };
+    modules: App<Element>;
+    markdown: { [path: string]: string };
   }
 
   interface Window {

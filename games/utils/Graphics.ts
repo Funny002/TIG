@@ -1,4 +1,4 @@
-import { Shape, GraphsCanvas } from 'tig-core';
+import { Shape, GraphsCanvas, AnimationFrame, getTime, Listener } from 'tig-core';
 
 // TODO: 绘制基础方块
 export function drawBlock(ctx: CanvasRenderingContext2D, block: number, left: number = 0, top: number = 0, color: string = '#849374') {
@@ -108,5 +108,46 @@ export class GameBackgroundLine extends GameBackgroundBlock {
       ctx.lineTo(width, top * block + top - 0.5);
     }
     ctx.stroke();
+  }
+}
+
+// TODO: 移动图像基类 - 创建 ·Shape· 抽象子类
+export abstract class MoveGraphics extends Shape {
+  abstract move(): void;
+
+  // TODO: 时间间隔
+  public timer: number = 240;
+
+  // TODO: 上一次的时间
+  private lestTime: number = 0;
+
+  // TODO: 暂停
+  private isStop: boolean = false;
+
+  // // TODO: 监听器
+  // private readonly listener = new Listener();
+
+  // TODO: 开始移动
+  private onMove() {
+    if (this.isStop) return;
+    const time = getTime();
+    if ((time - this.lestTime) > this.timer) {
+      this.move();
+      this.lestTime = time;
+      this.listener.publish('move', undefined);
+    }
+    AnimationFrame(this.onMove.bind(this));
+  }
+
+  // TODO: 开始移动
+  public startMove() {
+    this.lestTime = getTime();
+    this.isStop = false;
+    this.onMove();
+  }
+
+  // TODO: 停止移动
+  public stopMove() {
+    this.isStop = true;
   }
 }

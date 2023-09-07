@@ -1,12 +1,8 @@
 {
   "name": "Tetris",
   "version": "0.0.1",
-  "home": "src/index",
-  "icon": "public/Snake.png",
+  "main": "./src/index.vue",
+  "logo": "./public/Snake.png",
   "author": "Funny002<2048412928@qq.com>",
-  "description": "I's Template description",
-  "file": {
-    "update": "public/update",
-    "description": "public/index"
-  }
+  "description": "I's Template description"
 }

@@ -21,7 +21,7 @@
           </div>
           <div class="var-App__side-item--run_text">启动游戏</div>
         </div>
-        <div class="var-App__side-item--run_item" v-show="item.isDocs" style="background-color: #999;" @click.stop="onDocs(item)">
+        <div class="var-App__side-item--run_item" v-show="item.markdown" style="background-color: #999;" @click.stop="onDocs(item)">
           <div class="var-App__side-item--run_icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 16 16">
               <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/>
