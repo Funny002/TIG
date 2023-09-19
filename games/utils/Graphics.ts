@@ -124,8 +124,8 @@ export abstract class MoveGraphics extends Shape {
   // TODO: 暂停
   private isStop: boolean = false;
 
-  // // TODO: 监听器
-  // private readonly listener = new Listener();
+  // TODO: 监听器
+  private readonly listener = new Listener();
 
   // TODO: 开始移动
   private onMove() {
